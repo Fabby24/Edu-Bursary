@@ -131,9 +131,9 @@ CHATBOT_MODEL=claude
 
 ### AI Chatbot Setup
 
-1. Get API key from [Anthropic](https://www.anthropic.com) or [OpenAI](https://openai.com)
+1. Get API key from [Google Ai studio](https://aistudio.google.com)
 2. Add key to `.env` file
-3. Set `CHATBOT_MODEL` to either `claude` or `openai`
+3. Set `CHATBOT_MODEL` to either `gemini-2.0 Flash`
 
 The chatbot will:
 - Search the database for relevant bursaries
