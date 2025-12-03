@@ -133,7 +133,7 @@ CHATBOT_MODEL=claude
 
 1. Get API key from [Google Ai studio](https://aistudio.google.com)
 2. Add key to `.env` file
-3. Set `CHATBOT_MODEL` to either `gemini-2.0 Flash`
+3. Set `CHATBOT_MODEL` to  `gemini-2.0 Flash`
 
 The chatbot will:
 - Search the database for relevant bursaries
