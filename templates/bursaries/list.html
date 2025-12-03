@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Browse Bursaries - Edu Bursary Finder{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <!-- Filters Sidebar -->
+        <div class="col-lg-3 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0 fw-bold">Filters</h5>
+                </div>
+                <div class="card-body">
+                    <form method="get" id="filter-form">
+                        <!-- Search -->
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">Search</label>
+                            <input type="text" name="q" class="form-control" 
+                                   placeholder="Keywords..." value="{{ query }}">
+                        </div>
+                        
+                        <!-- Category -->
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">Category</label>
+                            <select name="category" class="form-select">
+                                <option value="">All Categories</option>
+                                <option value="merit">Merit-Based</option>
+                                <option value="need">Need-Based</option>
+                                <option value="sports">Sports</option>
+                                <option value="arts">Arts & Culture</option>
+                                <option value="stem">STEM</option>
+                                <option value="international">International</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Country -->
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">Country</label>
+                            <input type="text" name="country" class="form-control" 
+                                   placeholder="e.g., Kenya">
+                        </div>
+                        
+                        <!-- Education Level -->
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">Education Level</label>
+                            <select name="education_level" class="form-select">
+                                <option value="">All Levels</option>
+                                <option value="high_school">High School</option>
+                                <option value="undergraduate">Undergraduate</option>
+                                <option value="postgraduate">Postgraduate</option>
+                                <option value="doctorate">Doctorate</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Sort -->
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">Sort By</label>
+                            <select name="sort" class="form-select">
+                                <option value="-created_at">Newest First</option>
+                                <option value="application_deadline">Deadline (Soonest)</option>
+                                <option value="-amount">Amount (Highest)</option>
+                                <option value="-views_count">Most Popular</option>
+                            </select>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary w-100">Apply Filters</button>
+                        <a href="{% url 'bursaries:list' %}" class="btn btn-link w-100 mt-2">Clear All</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Bursaries Grid -->
+        <div class="col-lg-9">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="fw-bold mb-0">
+                    {% if query %}Search Results for "{{ query }}"{% else %}All Bursaries{% endif %}
+                </h2>
+                <span class="text-muted">{{ page_obj.paginator.count }} bursaries found</span>
+            </div>
+            
+            <div class="row g-4">
+                {% for bursary in page_obj %}
+                <div class="col-md-6 col-lg-4">
+                    {% include 'bursaries/includes/bursary_card.html' with bursary=bursary %}
+                </div>
+                {% empty %}
+                <div class="col-12 text-center py-5">
+                    <i class="bi bi-search display-1 text-muted"></i>
+                    <h4 class="mt-3">No bursaries found</h4>
+                    <p class="text-muted">Try adjusting your filters or search terms</p>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Pagination -->
+            {% if page_obj.has_other_pages %}
+            <nav class="mt-5">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}">Previous</a>
+                    </li>
+                    {% endif %}
+                    
+                    {% for num in page_obj.paginator.page_range %}
+                    <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                        <a class="page-link" href="?page={{ num }}{% if query %}&q={{ query }}{% endif %}">{{ num }}</a>
+                    </li>
+                    {% endfor %}
+                    
+                    {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}">Next</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

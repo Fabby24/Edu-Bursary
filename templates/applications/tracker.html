@@ -1,0 +1,184 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Applications - Edu Bursary Finder{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h2 class="fw-bold mb-4">My Application Tracker</h2>
+    
+    <!-- Stats Overview -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-3">
+            <div class="stat-card bg-info text-white">
+                <div class="stat-icon"><i class="bi bi-bookmark-fill"></i></div>
+                <div>
+                    <h3 class="fw-bold mb-0">{{ saved.count }}</h3>
+                    <small>Saved</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card bg-primary text-white">
+                <div class="stat-icon"><i class="bi bi-send-fill"></i></div>
+                <div>
+                    <h3 class="fw-bold mb-0">{{ applied.count }}</h3>
+                    <small>Applied</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card bg-warning text-white">
+                <div class="stat-icon"><i class="bi bi-hourglass-split"></i></div>
+                <div>
+                    <h3 class="fw-bold mb-0">{{ pending.count }}</h3>
+                    <small>Pending</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card bg-success text-white">
+                <div class="stat-icon"><i class="bi bi-check-circle-fill"></i></div>
+                <div>
+                    <h3 class="fw-bold mb-0">{{ approved.count }}</h3>
+                    <small>Approved</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Applications List -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-white">
+            <ul class="nav nav-tabs card-header-tabs" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" data-bs-toggle="tab" href="#all">All ({{ applications.count }})</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" href="#saved-tab">Saved ({{ saved.count }})</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" href="#applied-tab">Applied ({{ applied.count }})</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" href="#pending-tab">Pending ({{ pending.count }})</a>
+                </li>
+            </ul>
+        </div>
+        
+        <div class="card-body">
+            <div class="tab-content">
+                <!-- All Applications -->
+                <div class="tab-pane fade show active" id="all">
+                    {% include 'applications/includes/application_list.html' with apps=applications %}
+                </div>
+                
+                <!-- Saved -->
+                <div class="tab-pane fade" id="saved-tab">
+                    {% include 'applications/includes/application_list.html' with apps=saved %}
+                </div>
+                
+                <!-- Applied -->
+                <div class="tab-pane fade" id="applied-tab">
+                    {% include 'applications/includes/application_list.html' with apps=applied %}
+                </div>
+                
+                <!-- Pending -->
+                <div class="tab-pane fade" id="pending-tab">
+                    {% include 'applications/includes/application_list.html' with apps=pending %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Update Status Modal -->
+<div class="modal fade" id="updateStatusModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Update Application Status</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" id="updateStatusForm">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Status</label>
+                        <select name="status" class="form-select" required>
+                            <option value="saved">Saved</option>
+                            <option value="applied">Applied</option>
+                            <option value="pending">Pending Review</option>
+                            <option value="shortlisted">Shortlisted</option>
+                            <option value="rejected">Rejected</option>
+                            <option value="approved">Approved</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Notes (Optional)</label>
+                        <textarea name="notes" class="form-control" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Update Status</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Upload Document Modal -->
+<div class="modal fade" id="uploadDocModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Upload Document</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" enctype="multipart/form-data" id="uploadDocForm">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Document Type</label>
+                        <select name="document_type" class="form-select" required>
+                            <option value="id">ID Document</option>
+                            <option value="transcript">Academic Transcript</option>
+                            <option value="certificate">Certificate</option>
+                            <option value="letter">Motivation Letter</option>
+                            <option value="recommendation">Recommendation Letter</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">File</label>
+                        <input type="file" name="document" class="form-control" accept=".pdf,.doc,.docx" required>
+                        <small class="text-muted">PDF, DOC, DOCX (Max 5MB)</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Upload</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+// Handle modal forms
+let currentApplicationId = null;
+
+function openUpdateModal(appId) {
+    currentApplicationId = appId;
+    document.getElementById('updateStatusForm').action = `/applications/update/${appId}/`;
+    new bootstrap.Modal(document.getElementById('updateStatusModal')).show();
+}
+
+function openUploadModal(appId) {
+    currentApplicationId = appId;
+    document.getElementById('uploadDocForm').action = `/applications/upload/${appId}/`;
+    new bootstrap.Modal(document.getElementById('uploadDocModal')).show();
+}
+</script>
+{% endblock %}

@@ -1,0 +1,184 @@
+{% extends 'base.html' %}
+{% load static humanize %}
+
+{% block title %}{{ bursary.title }} - Edu Bursary Finder{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <!-- Main Content -->
+        <div class="col-lg-8 mb-4">
+            <!-- Header -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <span class="badge bg-primary">{{ bursary.get_category_display }}</span>
+                        <div class="d-flex gap-2">
+                            {% if user.is_authenticated %}
+                            <a href="{% url 'bursaries:toggle_bookmark' bursary.slug %}" 
+                               class="btn btn-sm {% if is_bookmarked %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                                <i class="bi bi-bookmark-fill"></i> 
+                                {% if is_bookmarked %}Bookmarked{% else %}Bookmark{% endif %}
+                            </a>
+                            <a href="{% url 'applications:add' bursary.id %}" class="btn btn-sm btn-accent">
+                                <i class="bi bi-plus-circle"></i> Track Application
+                            </a>
+                            {% else %}
+                            <a href="{% url 'accounts:login' %}" class="btn btn-sm btn-primary">
+                                Login to Apply
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <h1 class="fw-bold mb-3">{{ bursary.title }}</h1>
+                    
+                    <div class="d-flex flex-wrap gap-3 text-muted mb-3">
+                        <span><i class="bi bi-building me-1"></i>{{ bursary.provider_name }}</span>
+                        <span><i class="bi bi-geo-alt me-1"></i>{{ bursary.city }}, {{ bursary.country }}</span>
+                        <span><i class="bi bi-eye me-1"></i>{{ bursary.views_count }} views</span>
+                    </div>
+                    
+                    <!-- Key Info -->
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="info-box">
+                                <div class="info-icon bg-primary">
+                                    <i class="bi bi-cash-stack"></i>
+                                </div>
+                                <div>
+                                    <small class="text-muted">Award Amount</small>
+                                    <h4 class="fw-bold mb-0">{{ bursary.currency }} {{ bursary.amount|intcomma }}</h4>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-box">
+                                <div class="info-icon bg-danger">
+                                    <i class="bi bi-calendar-event"></i>
+                                </div>
+                                <div>
+                                    <small class="text-muted">Application Deadline</small>
+                                    <h4 class="fw-bold mb-0">{{ bursary.application_deadline|date:"M d, Y" }}</h4>
+                                    {% if bursary.days_until_deadline <= 7 %}
+                                    <span class="badge bg-danger">{{ bursary.days_until_deadline }} days left!</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Description -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0 fw-bold">About This Bursary</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-justify">{{ bursary.description|linebreaks }}</p>
+                </div>
+            </div>
+            
+            <!-- Eligibility -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0 fw-bold">Eligibility Requirements</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                            <strong>Education Level:</strong> {{ bursary.eligible_education_levels }}
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                            <strong>Field of Study:</strong> {{ bursary.eligible_fields }}
+                        </li>
+                        {% if bursary.min_gpa %}
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                            <strong>Minimum GPA:</strong> {{ bursary.min_gpa }}
+                        </li>
+                        {% endif %}
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                            <strong>Location:</strong> {{ bursary.country }}
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Required Documents -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0 fw-bold">Required Documents</h5>
+                </div>
+                <div class="card-body">
+                    <p>{{ bursary.required_documents|linebreaks }}</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Apply CTA -->
+            <div class="card shadow-sm mb-4 border-primary">
+                <div class="card-body text-center">
+                    <h5 class="fw-bold mb-3">Ready to Apply?</h5>
+                    {% if bursary.application_url %}
+                    <a href="{{ bursary.application_url }}" target="_blank" 
+                       class="btn btn-primary btn-lg w-100 mb-2">
+                        <i class="bi bi-box-arrow-up-right me-2"></i>Apply Now
+                    </a>
+                    {% endif %}
+                    {% if bursary.contact_email %}
+                    <a href="mailto:{{ bursary.contact_email }}" class="btn btn-outline-primary w-100">
+                        <i class="bi bi-envelope me-2"></i>Contact Provider
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Provider Info -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h6 class="mb-0 fw-bold">Provider Information</h6>
+                </div>
+                <div class="card-body">
+                    <p class="fw-semibold mb-2">{{ bursary.provider_name }}</p>
+                    {% if bursary.provider_website %}
+                    <a href="{{ bursary.provider_website }}" target="_blank" class="text-primary text-decoration-none">
+                        <i class="bi bi-globe me-1"></i>Visit Website
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Similar Bursaries -->
+            {% if similar_bursaries %}
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h6 class="mb-0 fw-bold">Similar Bursaries</h6>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        {% for similar in similar_bursaries %}
+                        <a href="{% url 'bursaries:detail' similar.slug %}" 
+                           class="list-group-item list-group-item-action">
+                            <h6 class="mb-1">{{ similar.title|truncatewords:8 }}</h6>
+                            <small class="text-muted">{{ similar.provider_name }}</small>
+                            <div class="d-flex justify-content-between mt-2">
+                                <small class="text-primary fw-bold">{{ similar.currency }} {{ similar.amount|intcomma }}</small>
+                                <small class="text-muted">{{ similar.application_deadline|date:"M d" }}</small>
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

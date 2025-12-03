@@ -1,0 +1,54 @@
+<!-- Floating Chat Button -->
+<button id="chatbot-toggle-btn" class="btn btn-primary chatbot-toggle" aria-label="Toggle Chatbot">
+    <i class="bi bi-chat-dots-fill fs-4"></i>
+</button>
+
+<!-- Chat Modal -->
+<div class="chatbot-modal" id="chatbot-modal">
+    <div class="chatbot-header">
+        <div class="d-flex align-items-center">
+            <div class="chatbot-avatar me-2">
+                <i class="bi bi-robot"></i>
+            </div>
+            <div>
+                <h6 class="mb-0 fw-bold">Bursary Assistant</h6>
+                <small class="text-white-50">AI-powered helper</small>
+            </div>
+        </div>
+        <button id="chatbot-close-btn" class="btn btn-sm btn-link text-white">
+            <i class="bi bi-x-lg"></i>
+        </button>
+    </div>
+    
+    <div class="chatbot-messages" id="chatbot-messages">
+        <div class="message bot-message">
+            <div class="message-content">
+                <p class="mb-0">Hi! I'm your bursary assistant. How can I help you today?</p>
+                <small class="text-muted">I can help you find bursaries, understand requirements, and guide you through applications.</small>
+            </div>
+        </div>
+    </div>
+    
+    <div class="chatbot-input-area">
+        <form id="chatbot-form">
+            <div class="input-group">
+                <input type="text" id="chatbot-input" class="form-control" 
+                       placeholder="Ask me anything about bursaries..." 
+                       autocomplete="off">
+                <button type="submit" class="btn btn-primary" id="chatbot-send-btn">
+                    <i class="bi bi-send-fill"></i>
+                </button>
+            </div>
+        </form>
+    </div>
+    
+    <!-- Loading indicator -->
+    <div class="chatbot-loading d-none" id="chatbot-loading">
+        <div class="spinner-border spinner-border-sm text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <span class="ms-2">Thinking...</span>
+    </div>
+</div>
+
+<input type="hidden" id="chatbot-session-id" value="">

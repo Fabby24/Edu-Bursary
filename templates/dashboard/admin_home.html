@@ -1,0 +1,211 @@
+{% extends 'base.html' %}
+{% load static humanize %}
+
+{% block title %}Admin Dashboard - Edu Bursary Finder{% endblock %}
+
+{% block extra_css %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold mb-0">Admin Dashboard</h2>
+        <div class="btn-group">
+            <a href="{% url 'dashboard:export_bursaries' %}" class="btn btn-outline-primary">
+                <i class="bi bi-download"></i> Export Bursaries
+            </a>
+            <a href="{% url 'dashboard:export_applications' %}" class="btn btn-outline-primary">
+                <i class="bi bi-download"></i> Export Applications
+            </a>
+        </div>
+    </div>
+    
+    <!-- Overview Stats -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1">Total Bursaries</h6>
+                            <h2 class="fw-bold mb-0">{{ overview.total_bursaries }}</h2>
+                        </div>
+                        <i class="bi bi-award display-4 opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card bg-success text-white shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1">Total Students</h6>
+                            <h2 class="fw-bold mb-0">{{ overview.total_students|intcomma }}</h2>
+                        </div>
+                        <i class="bi bi-people display-4 opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card bg-info text-white shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1">Total Applications</h6>
+                            <h2 class="fw-bold mb-0">{{ overview.total_applications|intcomma }}</h2>
+                        </div>
+                        <i class="bi bi-file-earmark-check display-4 opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card bg-danger text-white shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1">Closing Soon</h6>
+                            <h2 class="fw-bold mb-0">{{ overview.approaching_deadline }}</h2>
+                        </div>
+                        <i class="bi bi-clock-history display-4 opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Charts Row -->
+    <div class="row g-4 mb-4">
+        <div class="col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0 fw-bold">Category Distribution</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="categoryChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0 fw-bold">Popular Fields of Study</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="fieldsChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Top Performing Bursaries -->
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 fw-bold">Top Performing Bursaries</h5>
+                    <a href="{% url 'dashboard:manage_bursaries' %}" class="btn btn-sm btn-primary">Manage All</a>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Bursary</th>
+                                    <th>Category</th>
+                                    <th>Applications</th>
+                                    <th>Views</th>
+                                    <th>Deadline</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for bursary in top_bursaries %}
+                                <tr>
+                                    <td class="fw-semibold">{{ bursary.title|truncatewords:10 }}</td>
+                                    <td><span class="badge bg-primary">{{ bursary.get_category_display }}</span></td>
+                                    <td>{{ bursary.application_count }}</td>
+                                    <td>{{ bursary.views_count }}</td>
+                                    <td>{{ bursary.application_deadline|date:"M d, Y" }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0 fw-bold">Student Engagement</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Profile Completion</span>
+                            <span class="fw-bold">{{ engagement.profile_completion_rate }}%</span>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar bg-success" style="width: {{ engagement.profile_completion_rate }}%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <h6 class="text-muted mb-2">Active Students</h6>
+                        <h3 class="fw-bold text-primary">{{ engagement.active_students }}</h3>
+                    </div>
+                    
+                    <div>
+                        <h6 class="text-muted mb-2">Complete Profiles</h6>
+                        <h3 class="fw-bold text-success">{{ engagement.complete_profiles }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Category Chart
+const categoryData = {{ categories|safe }};
+const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+new Chart(categoryCtx, {
+    type: 'doughnut',
+    data: {
+        labels: categoryData.map(c => c.category),
+        datasets: [{
+            data: categoryData.map(c => c.count),
+            backgroundColor: ['#1A73E8', '#0C3B78', '#F9A825', '#34A853', '#EA4335', '#FBBC04']
+        }]
+    }
+});
+
+// Fields Chart
+const fieldsData = {{ popular_fields|safe }};
+const fieldsCtx = document.getElementById('fieldsChart').getContext('2d');
+new Chart(fieldsCtx, {
+    type: 'bar',
+    data: {
+        labels: fieldsData.map(f => f.field_of_study),
+        datasets: [{
+            label: 'Students',
+            data: fieldsData.map(f => f.count),
+            backgroundColor: '#1A73E8'
+        }]
+    },
+    options: {
+        scales: {
+            y: { beginAtZero: true }
+        }
+    }
+});
+</script>
+{% endblock %}
