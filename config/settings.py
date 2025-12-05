@@ -1,10 +1,14 @@
 import os
 from pathlib import Path
 from decouple import config
+from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = config('SECRET_KEY', default='django-insecure-change-this-in-production')
+ 
+# Load environment variables from .env at project root (if present)
+load_dotenv(str(BASE_DIR / '.env'))
 DEBUG = config('DEBUG', default=True, cast=bool)
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1').split(',')
 
@@ -133,14 +137,10 @@ LOGOUT_REDIRECT_URL = 'home'
 # DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='noreply@bursaryfinder.com')
 
 # AI Chatbot API Configuration
-# ANTHROPIC_API_KEY = config('ANTHROPIC_API_KEY', default='')
-# OPENAI_API_KEY = config('OPENAI_API_KEY', default='')
-# CHATBOT_MODEL = config('CHATBOT_MODEL', default='claude')  # 'claude' or 'openai'
-
-from decouple import config
-
-GOOGLE_API_KEY = config('GOOGLE_API_KEY', default='AIzaSyCJAAXnzPksLN3Fgq6U8oUWWl43ngiO4sY')
-CHATBOT_MODEL = config('CHATBOT_MODEL', default='google')  # 'google' for free Gemini tier
+# Prefer loading the Google API key from the environment (.env). If not present,
+# fall back to python-decouple's config default.
+GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY') 
+CHATBOT_MODEL = os.getenv('CHATBOT_MODEL') 
 
 # # Security Settings (Production)
 if not DEBUG:
